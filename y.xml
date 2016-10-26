@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<root>
+  <one>
+    <a>a</a>
+    <b>b</b>
+    <c>c</c>
+    <d>d</d>
+  </one>
+  <two attrib1="hi" attrib2="hey">
+    <elem>
+      <Jan>1.1</Jan>
+      <Feb>2.2</Feb>
+      <Mar>3.3</Mar>
+      <Apr>4.4</Apr>
+    </elem>
+    <hey>
+      <elem>TRUE</elem>
+      <elem>FALSE</elem>
+    </hey>
+  </two>
+</root>

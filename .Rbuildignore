@@ -9,3 +9,6 @@ windows
 ^docker$
 ^src/\.ycm_extra_conf\.py$
 ^src/\.ycm_extra_conf\.pyc$
+^as_xml-demo.R$
+^as_xml-demo.md$
+^y.xml$
