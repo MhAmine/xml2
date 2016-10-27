@@ -19,9 +19,7 @@ escaped_attributes <- function(x) {
 }
 
 as_xml <- function(x, tag = "root", parent = NULL, .missing_tag = "elem") {
-  if (is.null(x)) {
-    x <- ""
-  }
+  x <- x %||% ""
   if (!purrr::is_vector(x)) {
     stop("Input must be a vector, not:", typeof(x), call. = FALSE)
   }
@@ -34,7 +32,10 @@ as_xml <- function(x, tag = "root", parent = NULL, .missing_tag = "elem") {
     purrr::map2(attr, names(attr), function(a, n) xml_attr(this_node, n) <- a)
   }
   if (purrr::is_scalar_atomic(x)) {
-    xml_text(this_node) <- as.character(x)
+    if (!is.character(x)) {
+      x <- as.character(x)
+    }
+    xml_text(this_node) <- x
     return(xml_root(this_node))
   }
   purrr::map2(x, names2(x, .missing_tag), ~ as_xml(.x, .y, this_node))
