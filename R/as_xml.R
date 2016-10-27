@@ -18,13 +18,16 @@ escaped_attributes <- function(x) {
   attr <- attr[!special]
 }
 
-as_xml <- function(x, tag = "root", parent = NULL, .missing_tag = "elem") {
+as_xml <- function(x, root_tag = "root", .missing_tag = "elem") {
+  doc <- xml_new_document()
+  install_node(x, tag = root_tag, doc, .missing_tag = .missing_tag)
+  xml_root(doc)
+}
+
+install_node <- function(x, tag, parent, .missing_tag = "elem") {
   x <- x %||% ""
   if (!purrr::is_vector(x)) {
     stop("Input must be a vector, not:", typeof(x), call. = FALSE)
-  }
-  if (!inherits(parent, "xml_node")) {
-    parent <- xml_new_document()
   }
   this_node <- xml_add_child(parent, tag)
   attr <- escaped_attributes(x)
@@ -38,5 +41,5 @@ as_xml <- function(x, tag = "root", parent = NULL, .missing_tag = "elem") {
     xml_text(this_node) <- x
     return(xml_root(this_node))
   }
-  purrr::map2(x, names2(x, .missing_tag), ~ as_xml(.x, .y, this_node))
+  purrr::map2(x, names2(x, .missing_tag), ~ install_node(.x, .y, this_node))
 }

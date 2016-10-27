@@ -1,7 +1,7 @@
 First try at as\_xml()
 ================
 jenny
-Wed Oct 26 17:46:24 2016
+Wed Oct 26 23:07:43 2016
 
 ``` r
 devtools::load_all(".")
@@ -41,89 +41,39 @@ y_list
 #> 
 #> $three
 #> NULL
-```
 
-I think I am producing the correct XML. One problem, two questions:
-
--   Preliminary: I know I would need to remove the use of purrr.
--   Problem: The return value is a list, with the same overall topology as `y_list`. Each leaf is, I believe, an instance of the single thing I should actually be returning: the thing that holds pointers to the document and root node. Currently I have to go find a leaf to get that. How do I fix that?
--   Question: I'm not sure I'm handling the "missing tag" issue the best way.
--   Question: I'm not sure `parent` should be an exposed argument. Should `as_xml()` only support creation of stand-alone XML (vs. creating XML from list and installing into existing XML)?
-
-``` r
 y_xml <- as_xml(y_list)
-
-str(y_xml)
-#> List of 3
-#>  $      :List of 4
-#>   ..$ a:List of 2
-#>   .. ..$ node:<externalptr> 
-#>   .. ..$ doc :<externalptr> 
-#>   .. ..- attr(*, "class")= chr [1:2] "xml_document" "xml_node"
-#>   ..$ b:List of 2
-#>   .. ..$ node:<externalptr> 
-#>   .. ..$ doc :<externalptr> 
-#>   .. ..- attr(*, "class")= chr [1:2] "xml_document" "xml_node"
-#>   ..$ c:List of 2
-#>   .. ..$ node:<externalptr> 
-#>   .. ..$ doc :<externalptr> 
-#>   .. ..- attr(*, "class")= chr [1:2] "xml_document" "xml_node"
-#>   ..$ d:List of 2
-#>   .. ..$ node:<externalptr> 
-#>   .. ..$ doc :<externalptr> 
-#>   .. ..- attr(*, "class")= chr [1:2] "xml_document" "xml_node"
-#>  $ two  :List of 2
-#>   ..$    :List of 4
-#>   .. ..$ Jan:List of 2
-#>   .. .. ..$ node:<externalptr> 
-#>   .. .. ..$ doc :<externalptr> 
-#>   .. .. ..- attr(*, "class")= chr [1:2] "xml_document" "xml_node"
-#>   .. ..$ Feb:List of 2
-#>   .. .. ..$ node:<externalptr> 
-#>   .. .. ..$ doc :<externalptr> 
-#>   .. .. ..- attr(*, "class")= chr [1:2] "xml_document" "xml_node"
-#>   .. ..$ Mar:List of 2
-#>   .. .. ..$ node:<externalptr> 
-#>   .. .. ..$ doc :<externalptr> 
-#>   .. .. ..- attr(*, "class")= chr [1:2] "xml_document" "xml_node"
-#>   .. ..$ Apr:List of 2
-#>   .. .. ..$ node:<externalptr> 
-#>   .. .. ..$ doc :<externalptr> 
-#>   .. .. ..- attr(*, "class")= chr [1:2] "xml_document" "xml_node"
-#>   ..$ hey:List of 2
-#>   .. ..$ :List of 2
-#>   .. .. ..$ node:<externalptr> 
-#>   .. .. ..$ doc :<externalptr> 
-#>   .. .. ..- attr(*, "class")= chr [1:2] "xml_document" "xml_node"
-#>   .. ..$ :List of 2
-#>   .. .. ..$ node:<externalptr> 
-#>   .. .. ..$ doc :<externalptr> 
-#>   .. .. ..- attr(*, "class")= chr [1:2] "xml_document" "xml_node"
-#>  $ three:List of 2
-#>   ..$ node:<externalptr> 
-#>   ..$ doc :<externalptr> 
-#>   ..- attr(*, "class")= chr [1:2] "xml_document" "xml_node"
-y_root <- y_xml[[1]][[1]]
-str(y_root)
-#> List of 2
-#>  $ node:<externalptr> 
-#>  $ doc :<externalptr> 
-#>  - attr(*, "class")= chr [1:2] "xml_document" "xml_node"
+#str(y_xml)
 ```
 
-`y_root` is what I want. Inspect it your favorite way.
+Here's the XML
+
+    <?xml version="1.0"?>
+    <root>
+      <elem>
+        <a>a</a>
+        <b>b</b>
+        <c>c</c>
+        <d>d</d>
+      </elem>
+      <two attrib1="hi" attrib2="hey">
+        <elem>
+          <Jan>1.1</Jan>
+          <Feb>2.2</Feb>
+          <Mar>3.3</Mar>
+          <Apr>4.4</Apr>
+        </elem>
+        <hey>
+          <elem>TRUE</elem>
+          <elem>FALSE</elem>
+        </hey>
+      </two>
+      <three/>
+    </root>
+
+Run this though `as_list()` and compare to original `y_list`. We can't really roundtrip because there's no way to recover the atomic vectors. But I think this is as close as you can reasonably get?
 
 ``` r
-#y_root %>% xml_view() # could xml2 pretty print like this w/o printing to file?
-y_root %>% as.character()     # really hard to look at
-#> [1] "<?xml version=\"1.0\"?>\n<root><elem><a>a</a><b>b</b><c>c</c><d>d</d></elem><two attrib1=\"hi\" attrib2=\"hey\"><elem><Jan>1.1</Jan><Feb>2.2</Feb><Mar>3.3</Mar><Apr>4.4</Apr></elem><hey><elem>TRUE</elem><elem>FALSE</elem></hey></two><three/></root>\n"
-y_root %>% write_xml("y.xml")
-```
-
-Run this though `as_list()` and compare to original `y_list`. We can't really roundtrip because there's no way to recover the atomic vectors. But I think this is as close as you can reasonably get.
-
-``` r
-w <- as_list(y_root)
 y_list
 #> [[1]]
 #>   a   b   c   d 
@@ -144,7 +94,7 @@ y_list
 #> 
 #> $three
 #> NULL
-w
+as_list(y_xml)
 #> $elem
 #> $elem$a
 #> $elem$a[[1]]
