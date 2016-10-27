@@ -19,6 +19,9 @@ escaped_attributes <- function(x) {
 }
 
 as_xml <- function(x, tag = "root", parent = NULL, .missing_tag = "elem") {
+  if (is.null(x)) {
+    x <- ""
+  }
   if (!purrr::is_vector(x)) {
     stop("Input must be a vector, not:", typeof(x), call. = FALSE)
   }
