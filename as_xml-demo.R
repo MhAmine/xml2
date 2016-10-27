@@ -12,11 +12,12 @@ library(magrittr)
 #library(xmlview)
 
 y_list <- list(
-  one = setNames(letters[1:4], letters[1:4]),
+  setNames(letters[1:4], letters[1:4]),
   two = list(
     setNames(1:4 * 1.1, month.abb[1:4]),
     hey = c(TRUE, FALSE)
-  )
+  ),
+  three = NULL
 )
 attr(y_list$two, "attrib1") <- "hi"
 attr(y_list$two, "attrib2") <- "hey"

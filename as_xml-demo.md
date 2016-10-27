@@ -1,7 +1,7 @@
 First try at as\_xml()
 ================
 jenny
-Wed Oct 26 15:02:10 2016
+Wed Oct 26 17:46:24 2016
 
 ``` r
 devtools::load_all(".")
@@ -12,16 +12,17 @@ library(magrittr)
 #library(xmlview)
 
 y_list <- list(
-  one = setNames(letters[1:4], letters[1:4]),
+  setNames(letters[1:4], letters[1:4]),
   two = list(
     setNames(1:4 * 1.1, month.abb[1:4]),
     hey = c(TRUE, FALSE)
-  )
+  ),
+  three = NULL
 )
 attr(y_list$two, "attrib1") <- "hi"
 attr(y_list$two, "attrib2") <- "hey"
 y_list
-#> $one
+#> [[1]]
 #>   a   b   c   d 
 #> "a" "b" "c" "d" 
 #> 
@@ -37,6 +38,9 @@ y_list
 #> [1] "hi"
 #> attr(,"attrib2")
 #> [1] "hey"
+#> 
+#> $three
+#> NULL
 ```
 
 I think I am producing the correct XML. One problem, two questions:
@@ -50,8 +54,8 @@ I think I am producing the correct XML. One problem, two questions:
 y_xml <- as_xml(y_list)
 
 str(y_xml)
-#> List of 2
-#>  $ one:List of 4
+#> List of 3
+#>  $      :List of 4
 #>   ..$ a:List of 2
 #>   .. ..$ node:<externalptr> 
 #>   .. ..$ doc :<externalptr> 
@@ -68,7 +72,7 @@ str(y_xml)
 #>   .. ..$ node:<externalptr> 
 #>   .. ..$ doc :<externalptr> 
 #>   .. ..- attr(*, "class")= chr [1:2] "xml_document" "xml_node"
-#>  $ two:List of 2
+#>  $ two  :List of 2
 #>   ..$    :List of 4
 #>   .. ..$ Jan:List of 2
 #>   .. .. ..$ node:<externalptr> 
@@ -95,6 +99,10 @@ str(y_xml)
 #>   .. .. ..$ node:<externalptr> 
 #>   .. .. ..$ doc :<externalptr> 
 #>   .. .. ..- attr(*, "class")= chr [1:2] "xml_document" "xml_node"
+#>  $ three:List of 2
+#>   ..$ node:<externalptr> 
+#>   ..$ doc :<externalptr> 
+#>   ..- attr(*, "class")= chr [1:2] "xml_document" "xml_node"
 y_root <- y_xml[[1]][[1]]
 str(y_root)
 #> List of 2
@@ -108,7 +116,7 @@ str(y_root)
 ``` r
 #y_root %>% xml_view() # could xml2 pretty print like this w/o printing to file?
 y_root %>% as.character()     # really hard to look at
-#> [1] "<?xml version=\"1.0\"?>\n<root><one><a>a</a><b>b</b><c>c</c><d>d</d></one><two attrib1=\"hi\" attrib2=\"hey\"><elem><Jan>1.1</Jan><Feb>2.2</Feb><Mar>3.3</Mar><Apr>4.4</Apr></elem><hey><elem>TRUE</elem><elem>FALSE</elem></hey></two></root>\n"
+#> [1] "<?xml version=\"1.0\"?>\n<root><elem><a>a</a><b>b</b><c>c</c><d>d</d></elem><two attrib1=\"hi\" attrib2=\"hey\"><elem><Jan>1.1</Jan><Feb>2.2</Feb><Mar>3.3</Mar><Apr>4.4</Apr></elem><hey><elem>TRUE</elem><elem>FALSE</elem></hey></two><three/></root>\n"
 y_root %>% write_xml("y.xml")
 ```
 
@@ -117,7 +125,7 @@ Run this though `as_list()` and compare to original `y_list`. We can't really ro
 ``` r
 w <- as_list(y_root)
 y_list
-#> $one
+#> [[1]]
 #>   a   b   c   d 
 #> "a" "b" "c" "d" 
 #> 
@@ -133,25 +141,28 @@ y_list
 #> [1] "hi"
 #> attr(,"attrib2")
 #> [1] "hey"
+#> 
+#> $three
+#> NULL
 w
-#> $one
-#> $one$a
-#> $one$a[[1]]
+#> $elem
+#> $elem$a
+#> $elem$a[[1]]
 #> [1] "a"
 #> 
 #> 
-#> $one$b
-#> $one$b[[1]]
+#> $elem$b
+#> $elem$b[[1]]
 #> [1] "b"
 #> 
 #> 
-#> $one$c
-#> $one$c[[1]]
+#> $elem$c
+#> $elem$c[[1]]
 #> [1] "c"
 #> 
 #> 
-#> $one$d
-#> $one$d[[1]]
+#> $elem$d
+#> $elem$d[[1]]
 #> [1] "d"
 #> 
 #> 
@@ -195,4 +206,7 @@ w
 #> [1] "hi"
 #> attr(,"attrib2")
 #> [1] "hey"
+#> 
+#> $three
+#> list()
 ```
