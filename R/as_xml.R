@@ -19,10 +19,7 @@ escaped_attributes <- function(x) {
 }
 
 as_xml <- function(x, root_tag = "root", .missing_tag = "elem") {
-  #doc <- xml_new_document()
-  ## workaround to get UTF-8
-  ## https://github.com/hadley/xml2/issues/142
-  doc <- read_xml(paste0("<", root_tag, "></", root_tag, ">"))
+  doc <- xml_new_document()
   install_node(x, tag = root_tag, doc, .missing_tag = .missing_tag)
   xml_root(doc)
 }
